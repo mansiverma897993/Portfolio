@@ -1,4 +1,4 @@
-# Mansi Verma - 3D Animated Portfolio
+# Mansi Verma - Portfolio :)
 
 A modern, professional animated 3D portfolio website built with HTML5, CSS3, and Three.js. Features a sleek grey and white theme with interactive 3D objects and smooth animations.
 
