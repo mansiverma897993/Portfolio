@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAN$I VERMA - 3D Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8e8e8 0%, #d8d8d8 100%);
+            color: #333;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #444 0%, #666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #333;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #666;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section - no blur so 3D animation is visible */
+        #hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4rem;
+            margin-top: 60px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(235, 235, 235, 0.5);
+            z-index: 10;
+            gap: 3rem;
+        }
+
+        .hero-content {
+            z-index: 10;
+            animation: slideInLeft 1s ease;
+            text-align: center;
+            max-width: 800px;
+            flex: 1;
+        }
+
+        .hero-image {
+            z-index: 10;
+            animation: slideInRight 1s ease;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-image img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+            aspect-ratio: 1 / 1;
+        }
+
+        .hero-content h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1.25rem;
+            color: #222;
+            line-height: 1.1;
+        }
+
+        .hero-content .highlight {
+            background: linear-gradient(135deg, #666 0%, #999 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-content p {
+            font-size: 1.45rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-socials {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.25rem;
+            margin-top: 2.25rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-socials a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #444 0%, #666 100%);
+            color: white;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-socials a:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+        }
+
+        .hero-socials a svg {
+            width: 26px;
+            height: 26px;
+            fill: currentColor;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, #444 0%, #666 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 3D Canvas */
+        #canvas {
+            pointer-events: none;
+        }
+
+        /* Sections */
+        section {
+            padding: 6rem 4rem;
+            background: rgba(255, 255, 255, 0.95);
+            margin: 2rem 0;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            color: #222;
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #666 0%, #999 100%);
+            border-radius: 2px;
+        }
+
+        /* Skills Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .skill-card {
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            border-left: 4px solid #666;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #f0f0f0 0%, #e5e5e5 100%);
+        }
+
+        .skill-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .skill-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Experience Timeline */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #ddd 0%, #999 50%, #ddd 100%);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            margin-bottom: 3rem;
+            width: 45%;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .timeline-item:nth-child(odd) {
+            margin-left: 0;
+            text-align: right;
+            padding-right: 3rem;
+        }
+
+        .timeline-item:nth-child(even) {
+            margin-left: 55%;
+            padding-left: 3rem;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #666;
+            border: 4px solid white;
+            border-radius: 50%;
+            top: 0;
+            box-shadow: 0 0 0 4px #ddd;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-dot {
+            right: -78px;
+            left: auto;
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            left: -78px;
+        }
+
+        .timeline-content {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 3px solid #666;
+        }
+
+        .timeline-content h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content .date {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            display: block;
+            background: #f9f9f9;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #ddd 0%, #bbb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            overflow: hidden;
+        }
+
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .project-content {
+            padding: 2rem;
+        }
+
+        .project-content h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .project-content p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e8e8e8;
+            color: #555;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Contact Section */
+        #contact {
+            text-align: center;
+            background: rgba(245, 245, 245, 0.95);
+        }
+
+        .contact-card {
+            max-width: 520px;
+            margin: 0 auto 2rem;
+            padding: 2.5rem;
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            border-radius: 20px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #666;
+            text-align: left;
+        }
+
+        .contact-card .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-card label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .contact-card input,
+        .contact-card textarea {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .contact-card input:focus,
+        .contact-card textarea:focus {
+            outline: none;
+            border-color: #666;
+            box-shadow: 0 0 0 3px rgba(102, 102, 102, 0.15);
+        }
+
+        .contact-card textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .contact-card .submit-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #444 0%, #666 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .contact-card .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        footer {
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+        }
+
+        /* Animations */
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotateX(0) rotateY(0) rotateZ(0);
+            }
+            to {
+                transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
+
+            #hero {
+                flex-direction: column;
+                padding: 2rem;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-image img {
+                max-width: 300px;
+            }
+
+            section {
+                padding: 3rem 2rem;
+            }
+
+            .timeline::before {
+                left: 0;
+            }
+
+            .timeline-item {
+                width: 100%;
+                margin-left: 0;
+                text-align: left;
+                padding-left: 3rem;
+            }
+
+            .timeline-item:nth-child(odd) {
+                text-align: left;
+                padding-right: 0;
+                padding-left: 3rem;
+            }
+
+            .timeline-dot {
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Canvas Background -->
+    <canvas id="canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: block; z-index: 1;"></canvas>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">MV</div>
+        <ul class="nav-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#achievements">Achievements</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="Mansi-Verma-Resume.pdf" target="_blank" rel="noopener" title="Open Mansi Verma Resume (PDF)">Resume</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section with 3D -->
+    <section id="hero">
+        <div class="hero-content">
+            <h1>Hi, I'm <span class="highlight">MAN$I VERMA</span></h1>
+            <p>Full stack developer | Web3/Blockchain Enthusiast | Content Creator</p>
+            <a href="#projects" class="cta-button">View My Work</a>
+            <div class="hero-socials">
+                <a href="https://www.linkedin.com/in/mansi-verma-4794a4328/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </a>
+                <a href="https://github.com/mansiverma897993" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+                <a href="https://x.com/MansiVe61115132?t=cZMkDa3EYq1LpVr-BXoZ3g&s=09" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://www.youtube.com/@expressbymansi" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                </a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="mypic.jpg" alt="MAN$I VERMA" id="profileImage">
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" style="margin-top: 4rem;">
+        <h2 class="section-title">About Me</h2>
+        <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <p style="font-size: 1.1rem; color: #666; line-height: 1.8; margin-bottom: 1.5rem;">
+                I'm a Web3 & Full-Stack Developer passionate about building scalable products using Rust, TypeScript, and the Solana blockchain. I enjoy working on open-source projects, developing smart contracts, CLI tools, and backend architectures that solve real-world problems.
+            </p>
+            <p style="font-size: 1.1rem; color: #666; line-height: 1.8;">
+                I love debugging complex issues and optimizing systems, and I bring a creative, problem-solving mindset to everything I build. Alongside development, I'm also a content creator who enjoys sharing knowledge and learning in public.
+            </p>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills">
+        <h2 class="section-title">Skills & Expertise</h2>
+        <div class="skills-grid">
+            <div class="skill-card">
+                <h3>Programming Languages</h3>
+                <p>Rust, C++, Java, TypeScript</p>
+            </div>
+            <div class="skill-card">
+                <h3>Web Development</h3>
+                <p>React, JavaScript (ES6), Node.js, Express, REST APIs, WebSockets</p>
+            </div>
+            <div class="skill-card">
+                <h3>Databases</h3>
+                <p>PostgreSQL, MongoDB, MySQL, Supabase</p>
+            </div>
+            <div class="skill-card">
+                <h3>Cloud & DevOps</h3>
+                <p>AWS, Vercel, Docker</p>
+            </div>
+            <div class="skill-card">
+                <h3>Blockchain / Web3</h3>
+                <p>Blockchain, Web3.js, Rust, Solana, Hardhat, IPFS</p>
+            </div>
+            <div class="skill-card">
+                <h3>UI/UX Tools</h3>
+                <p>Figma, Canva</p>
+            </div>
+            <div class="skill-card">
+                <h3>Version Control</h3>
+                <p>Git, GitHub, Open Source</p>
+            </div>
+            <div class="skill-card">
+                <h3>Soft Skills</h3>
+                <p>Leadership, Communication, English</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience">
+        <h2 class="section-title">Experience</h2>
+        <div class="timeline">
+            <div class="timeline-item" style="animation-delay: 0.1s;">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>Contributor – FOSSC (Free & Open Source Software Community)</h3>
+                    <div class="date">Present</div>
+                    <p>Open-source contributor working on collaborative projects, improving code quality, documentation, and developer workflows. Actively involved in debugging, reviewing contributions, and building tools that support the open-source ecosystem.</p>
+                </div>
+            </div>
+            <div class="timeline-item" style="animation-delay: 0.2s;">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>Web Developer – Google Developer Group (GDG) KIET</h3>
+                    <div class="date">Present</div>
+                    <p>Web developer at GDG KIET, contributing to community-driven projects and technical initiatives. Involved in building web interfaces, supporting events, and collaborating with developers to deliver scalable and user-friendly solutions.</p>
+                </div>
+            </div>
+            <div class="timeline-item" style="animation-delay: 0.3s;">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>Blockchain Coordinator – AI Skills Labs (Centre of Excellence), KIET</h3>
+                    <div class="date">Present</div>
+                    <p>Leading blockchain-focused initiatives, mentoring peers, and coordinating technical sessions on Web3, smart contracts, and decentralized systems. Actively involved in building and managing blockchain-based projects and learning programs.</p>
+                </div>
+            </div>
+            <div class="timeline-item" style="animation-delay: 0.4s;">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>Technical Core Member – Genesis (Web3 & Blockchain Community)</h3>
+                    <div class="date">Present</div>
+                    <p>Core technical member of a Web3-focused community, contributing to blockchain development initiatives, organizing technical workshops, and supporting hands-on learning around smart contracts, decentralized applications, and emerging Web3 technologies.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <h2 class="section-title">Featured Projects</h2>
+        <div class="projects-grid">
+            <a class="project-card" href="https://github.com/mansiverma897993/Good-to-Go" target="_blank" rel="noopener noreferrer">
+                <div class="project-image"><img src="images/good-to-go.png" alt="Good-to-Go – Open Source Discovery Platform"></div>
+                <div class="project-content">
+                    <h3>Good-to-Go (GTG)</h3>
+                    <p>One-stop open-source opportunity discovery platform aggregating programs like GSoC, GSSoC, SWoC, Hacktoberfest, and Summer of Bitcoin using GitHub REST APIs for real-time program data.</p>
+                    <div class="project-tags">
+                        <span class="tag">Next.js</span>
+                        <span class="tag">TypeScript</span>
+                        <span class="tag">Node.js</span>
+                        <span class="tag">MongoDB</span>
+                    </div>
+                </div>
+            </a>
+            <a class="project-card" href="https://github.com/mansiverma897993/CrabVault" target="_blank" rel="noopener noreferrer">
+                <div class="project-image"><img src="images/crabvault.png" alt="CrabVault – CLI Password Vault"></div>
+                <div class="project-content">
+                    <h3>CrabVault – CLI Password Vault</h3>
+                    <p>Lightweight command-line password vault for secure local credential management with interactive workflows to add, list, and search entries efficiently.</p>
+                    <div class="project-tags">
+                        <span class="tag">Rust</span>
+                        <span class="tag">CLI</span>
+                    </div>
+                </div>
+            </a>
+            <a class="project-card" href="https://github.com/mansiverma897993/SolGalaxy" target="_blank" rel="noopener noreferrer">
+                <div class="project-image"><img src="images/solgalaxy.png" alt="SolGalaxy – NFT Marketplace"></div>
+                <div class="project-content">
+                    <h3>SolGalaxy – NFT Marketplace</h3>
+                    <p>Cross-chain NFT marketplace on Solana enabling minting, listing, buying, and selling of digital assets with a responsive TypeScript/React frontend and secure Rust smart contract backend.</p>
+                    <div class="project-tags">
+                        <span class="tag">Rust</span>
+                        <span class="tag">Solana</span>
+                        <span class="tag">TypeScript</span>
+                        <span class="tag">React</span>
+                        <span class="tag">Web3</span>
+                    </div>
+                </div>
+            </a>
+            <a class="project-card" href="https://github.com/mansiverma897993/Solcept" target="_blank" rel="noopener noreferrer">
+                <div class="project-image"><img src="images/solcept.png" alt="Solcept – Gamified Solana Learning"></div>
+                <div class="project-content">
+                    <h3>Solcept – Gamified Solana Learning</h3>
+                    <p>Solcept = Solana + Concept. A compact, animated, gamified course that teaches beginners Solana fundamentals, Rust, Anchor, and security through levels, quests, and hands-on challenges. Includes lessons, example programs, and mini audit missions.</p>
+                    <div class="project-tags">
+                        <span class="tag">Solana</span>
+                        <span class="tag">Rust</span>
+                        <span class="tag">Anchor</span>
+                        <span class="tag">Education</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section id="achievements">
+        <h2 class="section-title">Achievements</h2>
+        <div style="max-width: 900px; margin: 0 auto;">
+            <ul style="list-style: none; padding: 0; color: #666; font-size: 1.05rem; line-height: 1.8;">
+                <li><strong>Aspire Leadership Program (ALP’25)</strong> – Completed a leadership fellowship affiliated with Harvard University (2025).</li>
+                <li><strong>DoraDAO Fellowship (Dubai)</strong> – Completed a Web3 fellowship focused on decentralized governance and open-source innovation (2025).</li>
+                <li><strong>HackAura Hackathon – 1st Runner Up</strong> – Built <strong>VoteX</strong>, a blockchain-based voting system, securing first runner-up position (2025).</li>
+                <li><strong>Google Solution Challenge Participant</strong> – Developed a technology solution aligned with UN Sustainable Development Goals (2025).</li>
+                <li><strong>Yellow BIZThon (Top 7) – IIIT Delhi</strong> – Ranked among top teams in a global Web3/Blockchain business hackathon (2025).</li>
+                <li><strong>E-Summit 2025 Finalist – IIT Delhi</strong> – Finalist for presenting an innovative technology-driven solution.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2 class="section-title">Get In Touch</h2>
+        <p style="font-size: 1.1rem; color: #666; margin-bottom: 2rem;">I'd love to hear from you. Let's connect!</p>
+        <div class="contact-card">
+            <form id="contact-form" action="mailto:missmv897@gmail.com" method="get" enctype="text/plain">
+                <div class="form-group">
+                    <label for="contact-name">Name</label>
+                    <input type="text" id="contact-name" name="name" placeholder="Your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="contact-email">Email</label>
+                    <input type="email" id="contact-email" name="email" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="contact-message">Message</label>
+                    <textarea id="contact-message" name="body" placeholder="Send a message to connect..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Send message</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 MAN$I VERMA. All rights reserved.</p>
+        <p>Designed & Developed with ❤️</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
